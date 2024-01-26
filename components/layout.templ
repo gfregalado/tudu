@@ -1,0 +1,25 @@
+package components
+
+templ Layout(route string) {
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo with HTMX & Templ</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+     <link
+          href="https://cdn.jsdelivr.net/npm/daisyui@2.6.0/dist/full.css"
+          rel="stylesheet"
+          type="text/css"
+        />
+    <link href="static/css/styles.css" rel="stylesheet" />
+</head>
+
+<body class={"bg-neutral h-dvh"}>
+    @Navbar("Tudu")
+    <main id="view" hx-swap="innerHTML" hx-get={route} hx-trigger="load" class="px-8" />
+</body>
+</html>
+}
