@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"errors"
+	"github.com/gfregalado/todo/db"
 	"github.com/gfregalado/todo/handlers"
+	"github.com/gfregalado/todo/models"
 	"log"
 	"net/http"
 	"os"
@@ -13,6 +15,13 @@ import (
 )
 
 func main() {
+	dbClient, err := db.Init("./config/.env")
+
+	err = models.InitProductsTable(dbClient)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Set up a channel to listen for interrupt or terminate signals from the OS.
 	// This allows for graceful shutdown.
 	stopChan := make(chan os.Signal, 1)
@@ -35,6 +44,8 @@ func main() {
 	// Run the server in a goroutine so that it doesn't block.
 	go func() {
 		http.HandleFunc("/", handlers.HomeGetHandler)
+		http.HandleFunc("/api/create-product", handlers.Create)
+		http.HandleFunc("/api/product/:id", handlers.GetById)
 
 		log.Println("Server is ready to handle requests at http://localhost:3000")
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -51,7 +62,7 @@ func main() {
 	defer cancel()
 
 	// Stop the HTTP server.
-	err := server.Shutdown(ctx)
+	err = server.Shutdown(ctx)
 	if err != nil {
 		log.Fatalf("There was an error shutting down: %v", err)
 	}
